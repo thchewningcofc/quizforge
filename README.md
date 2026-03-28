@@ -3,3 +3,26 @@ QuizForge is a fully client-side, single-file HTML application (v1.0, March 2026
 
 ## CSP maintenance
 Keep the deployed Content Security Policy in `_headers` as the source of truth (hosting-level enforcement). If `index.html` includes a CSP `<meta http-equiv="Content-Security-Policy">`, it must match `_headers` to avoid policy drift between local previews and production.
+
+## Built-in CISSP deck maintenance
+
+The built-in `CISSP_DATA` exam bank in `index.html` now has a startup validator so malformed edits fail loudly during local testing and production load.
+
+### What is validated
+- `CISSP_DATA` is an array.
+- Every question entry is an object with:
+  - positive integer `id`
+  - non-empty `question` string
+  - `options` object containing non-empty `A`, `B`, `C`, and `D` strings
+  - `answer` set to one of `A | B | C | D`
+  - optional `explanation` as a string when present
+- No duplicate IDs.
+- No missing IDs in the sequence between the minimum and maximum ID values.
+
+### Maintainer workflow
+1. Edit `CISSP_DATA` in `index.html`.
+2. Open `index.html` in a browser.
+3. Verify no startup alert appears and no `CISSP_DATA validation failed` error is emitted in the browser console.
+4. Spot-check deck metadata in the library screen (question count, launch behavior).
+
+If validation fails, the built-in CISSP deck is intentionally excluded from the library until issues are fixed.
