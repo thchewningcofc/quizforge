@@ -1,27 +1,46 @@
 # quizforge
+
 QuizForge is a fully client-side, single-file HTML application (v1.0, March 2026) that converts PDF study materials into interactive multiple-choice quizzes. The entire system—including a built-in 386-question CISSP exam bank—runs entirely in the browser with no server dependencies, no installation, and no account requirements.
 
-## Run from GitHub (GitHub Pages)
+## Environment setup
 
-You can host and run QuizForge directly from your GitHub repo with GitHub Pages:
+### Requirements
+- A modern browser (Chrome, Edge, Firefox, Safari).
+- Git (if you want to version and publish changes).
+- Optional: a local static file server for closer parity with hosted behavior.
 
-1. Fork or create a repository and push these files (`index.html`, `_headers`, and `README.md`).
+### Local run (quick start)
+Because this is a client-side app, you can run it by opening `index.html` directly in your browser.
+
+### Local run (recommended for development)
+Run a static server from the project root to test under `http://localhost`:
+
+```bash
+python3 -m http.server 8080
+```
+
+Then open `http://localhost:8080/`.
+
+## Configure GitHub Pages
+
+This repository includes a GitHub Actions workflow at `.github/workflows/deploy-pages.yml` that deploys the site to GitHub Pages on every push to `main`.
+
+### One-time repository setup
+1. Push this repository to GitHub.
 2. In GitHub, open **Settings → Pages**.
-3. Under **Build and deployment**:
-   - **Source**: `Deploy from a branch`
-   - **Branch**: `main` (or your default branch)
-   - **Folder**: `/ (root)`
-4. Click **Save** and wait for deployment to complete.
-5. Open your published URL (`https://<your-username>.github.io/<repo-name>/`).
+3. Under **Build and deployment** set **Source** to **GitHub Actions**.
+4. Ensure your default publishing branch is `main` (or update the workflow trigger if you use another branch).
+5. Push to `main` and wait for the **Deploy static site to GitHub Pages** workflow to complete.
+6. Open your site at `https://<your-username>.github.io/<repo-name>/`.
+
+### Included deployment files
+- `.github/workflows/deploy-pages.yml` — builds/deploys the repository root as a Pages artifact.
+- `.nojekyll` — disables Jekyll processing, which avoids underscore-file handling issues.
 
 ### Important hosting note
-GitHub Pages does **not** use Netlify-style `_headers` files, so CSP headers in `_headers` will not be applied there. QuizForge still runs on GitHub Pages because `index.html` includes a CSP `<meta>` policy for browser-enforced protection.
+GitHub Pages does **not** use Netlify-style `_headers` files, so CSP headers in `_headers` are not applied there. QuizForge still runs on GitHub Pages because `index.html` includes a CSP `<meta>` policy for browser-enforced protection.
 
 If you later host on Netlify/Cloudflare Pages/etc., keep `_headers` aligned with the `index.html` CSP meta policy.
-
-## Local run (no install)
-
-Because this is a client-side app, you can also run it locally by opening `index.html` in your browser.
 
 ## CSP maintenance
 Keep the deployed Content Security Policy in `_headers` as the source of truth (hosting-level enforcement). If `index.html` includes a CSP `<meta http-equiv="Content-Security-Policy">`, it must match `_headers` to avoid policy drift between local previews and production.
