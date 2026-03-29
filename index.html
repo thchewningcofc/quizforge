@@ -1017,6 +1017,7 @@ function validateCisspData(data){
 }
 
 let library=[],activeDeck=null,qs={},timerInt=null,provider='smart',selFile=null;
+let isParsing=false,globalListenersBound=false;
 
 function init(){
   const cisspValidation=validateCisspData(CISSP_DATA);
@@ -1027,7 +1028,10 @@ function init(){
 
   const stored=JSON.parse(localStorage.getItem('qf_decks')||'[]');
   const builtinDecks=cisspValidation.ok?BUILTIN:[];
-  library=[...builtinDecks,...stored];renderLib();pickProvider('smart');
+  library=[...builtinDecks,...stored];
+  bindGlobalListeners();
+  renderLib();
+  pickProvider('smart');
 }
 function saveLib(){localStorage.setItem('qf_decks',JSON.stringify(library.filter(d=>!d.builtin)))}
 function getMissed(id){return JSON.parse(localStorage.getItem('qf_missed_'+id)||'[]')}
@@ -1035,6 +1039,8 @@ function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').rep
 
 function renderLib(){
   const g=document.getElementById('deck-grid');
+  if(!g)return;
+  g.replaceChildren();
   let h='';
   library.forEach(d=>{
     const missed=getMissed(d.id);
@@ -1110,35 +1116,45 @@ function openImport(){
 }
 function closeImport(){document.getElementById('import-modal').className='modal-overlay'}
 
-// ── KEYBOARD ACCESSIBILITY ───────────────────────────────
-// Escape key closes any open modal
-document.addEventListener('keydown',function(e){
-  if(e.key==='Escape'){
-    const openModal=document.querySelector('.modal-overlay.show');
-    if(openModal){
-      const id=openModal.id;
-      if(id==='import-modal')closeImport();
-      else if(id==='settings-modal')closeSettings();
-      else if(id==='cleanup-modal')closeCleanup();
-      else if(id==='explaingen-modal')closeExplainGen();
-      else if(id==='edit-q-modal')closeEditQ();
-      else if(id==='deck-editor-modal')closeDeckEditor();
-    }
-  }
-  // A/B/C/D and 1/2/3/4 answer shortcuts (existing logic extended with guard)
-});
+function bindGlobalListeners(){
+  if(globalListenersBound)return;
+  globalListenersBound=true;
 
-// Focus trap: keep Tab focus inside open modals
-document.addEventListener('keydown',function(e){
-  if(e.key!=='Tab')return;
-  const openModal=document.querySelector('.modal-overlay.show');
-  if(!openModal)return;
-  const focusable=openModal.querySelectorAll('button:not([disabled]),input:not([disabled]),[tabindex="0"]');
-  if(!focusable.length)return;
-  const first=focusable[0],last=focusable[focusable.length-1];
-  if(e.shiftKey){if(document.activeElement===first){e.preventDefault();last.focus();}}
-  else{if(document.activeElement===last){e.preventDefault();first.focus();}}
-});
+  // Escape key closes any open modal
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){
+      const openModal=document.querySelector('.modal-overlay.show');
+      if(openModal){
+        const id=openModal.id;
+        if(id==='import-modal')closeImport();
+        else if(id==='settings-modal')closeSettings();
+        else if(id==='cleanup-modal')closeCleanup();
+        else if(id==='explaingen-modal')closeExplainGen();
+        else if(id==='edit-q-modal')closeEditQ();
+        else if(id==='deck-editor-modal')closeDeckEditor();
+      }
+    }
+  });
+
+  // Focus trap: keep Tab focus inside open modals
+  document.addEventListener('keydown',function(e){
+    if(e.key!=='Tab')return;
+    const openModal=document.querySelector('.modal-overlay.show');
+    if(!openModal)return;
+    const focusable=openModal.querySelectorAll('button:not([disabled]),input:not([disabled]),[tabindex="0"]');
+    if(!focusable.length)return;
+    const first=focusable[0],last=focusable[focusable.length-1];
+    if(e.shiftKey){if(document.activeElement===first){e.preventDefault();last.focus();}}
+    else{if(document.activeElement===last){e.preventDefault();first.focus();}}
+  });
+
+  document.addEventListener('keydown',e=>{
+    if(document.getElementById('quiz-screen').style.display==='none')return;
+    if(document.activeElement.tagName==='INPUT')return;
+    if(!qs.answered){const m={a:'A',b:'B',c:'C',d:'D',1:'A',2:'B',3:'C',4:'D'};if(m[e.key.toLowerCase()])pick(m[e.key.toLowerCase()])}
+    else if(['Enter',' ','ArrowRight'].includes(e.key))nextQ();
+  });
+}
 
 function setImportStep(n){
   [1,2,3,4].forEach(i=>{
@@ -1199,8 +1215,14 @@ function setFile(f){
 }
 
 async function doExtract(){
-  if(!selFile)return;setImportStep(4);
+  if(!selFile)return;
+  if(isParsing)return;
+  isParsing=true;
+  setImportStep(4);
   const logEl=document.getElementById('log');
+  logEl.innerHTML='';
+  const extractBtn=document.getElementById('btn-extract');
+  if(extractBtn)extractBtn.disabled=true;
   function addLog(msg,cls=''){const l=document.createElement('span');l.className='ll '+cls;l.textContent=msg;logEl.appendChild(l);logEl.scrollTop=logEl.scrollHeight}
   const fname=selFile.name.replace('.pdf','');
   try{
@@ -1248,17 +1270,22 @@ async function doExtract(){
       let js=raw.trim().replace(/^```json?\s*/,'').replace(/\s*```$/,'').trim();
       try{questions=JSON.parse(js)}catch{const m=raw.match(/\[[\s\S]*\]/);if(!m)throw new Error('Could not parse AI response as JSON.');questions=JSON.parse(m[0])}
     }
-    const valid=questions.filter(q=>q.question&&q.options?.A&&q.options?.B&&q.options?.C&&q.options?.D&&['A','B','C','D'].includes(q.answer)).map((q,i)=>({...q,id:i+1}));
+    const deduped=dedupeQuestions(questions);
+    const valid=deduped.filter(q=>q.question&&q.options?.A&&q.options?.B&&q.options?.C&&q.options?.D&&['A','B','C','D'].includes(q.answer)).map((q,i)=>({...q,id:i+1}));
     if(!valid.length)throw new Error('No valid 4-option questions found.');
     addLog(`✓ ${valid.length} questions extracted!`,'ok');
-    const deckId='custom_'+Date.now();
+    const deckId='custom_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
     const tagLabel={smart:'Smart Parse',gemini:'Gemini Free',claude:'Claude AI',perp:'Perplexity'}[provider];
-    library.push({id:deckId,name:fname,tag:`${tagLabel} · ${valid.length} questions`,questions:valid,builtin:false,provider});
+    const deck={id:deckId,name:fname,tag:`${tagLabel} · ${valid.length} questions`,questions:valid,builtin:false,provider};
+    library=[...library,deck];
     saveLib();addLog(`✓ Deck saved!`,'ok');
     setTimeout(()=>{closeImport();renderLib();openSettings(deckId)},1200);
   }catch(err){
     addLog(`✗ ${err.message}`,'err');
     setImportStep(3);showErr(err.message);
+  }finally{
+    isParsing=false;
+    if(extractBtn)extractBtn.disabled=!selFile;
   }
 }
 
@@ -1279,7 +1306,26 @@ function smartParse(text){
       questions.push({id:i+1,question:cleanT(qt),options:{A:cleanT(b[1]),B:cleanT(b[2]),C:cleanT(b[3]),D:cleanT(b[4])},answer:ans});
     });
   }
-  return questions.slice(0,500);
+  return dedupeQuestions(questions).slice(0,500);
+}
+function dedupeQuestions(questions){
+  const seen=new Set();
+  const out=[];
+  questions.forEach((q)=>{
+    if(!q||!q.question||!q.options)return;
+    const sig=[
+      cleanT(q.question).toLowerCase(),
+      cleanT(q.options.A||'').toLowerCase(),
+      cleanT(q.options.B||'').toLowerCase(),
+      cleanT(q.options.C||'').toLowerCase(),
+      cleanT(q.options.D||'').toLowerCase(),
+      (q.answer||'').toUpperCase()
+    ].join('||');
+    if(seen.has(sig))return;
+    seen.add(sig);
+    out.push(q);
+  });
+  return out;
 }
 function parseBlock(block,id){
   const opts={};
@@ -1450,12 +1496,6 @@ function exitQuiz(){if(!confirm('Exit? Progress will be lost.'))return;clearInte
 function backToLib(){document.getElementById('library').style.display='block';document.getElementById('quiz-screen').style.display='none';document.getElementById('results-screen').style.display='none';window.scrollTo(0,0)}
 function retryDeck(){openSettings(qs.deckId)}
 
-document.addEventListener('keydown',e=>{
-  if(document.getElementById('quiz-screen').style.display==='none')return;
-  if(document.activeElement.tagName==='INPUT')return;
-  if(!qs.answered){const m={a:'A',b:'B',c:'C',d:'D',1:'A',2:'B',3:'C',4:'D'};if(m[e.key.toLowerCase()])pick(m[e.key.toLowerCase()])}
-  else if(['Enter',' ','ArrowRight'].includes(e.key))nextQ();
-});
 // ── GEMINI RATE-LIMIT HELPER ────────────────────────────────
 // Calls Gemini, and if rate-limited parses the retry delay from the
 // error, shows a live countdown in a target element, then auto-retries.
