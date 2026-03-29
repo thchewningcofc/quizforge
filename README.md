@@ -42,6 +42,19 @@ GitHub Pages does **not** use Netlify-style `_headers` files, so CSP headers in 
 
 If you later host on Netlify/Cloudflare Pages/etc., keep `_headers` aligned with the `index.html` CSP meta policy.
 
+
+## Public repository security checklist
+
+Before making this repository public:
+
+- Confirm no secrets are committed (`.env`, private keys, cert bundles, or token files).
+- Keep hosting security headers enabled (see `_headers`) and serve over HTTPS.
+- Keep CSP declarations in `index.html` and `_headers` aligned.
+- API keys entered in the app are stored in `sessionStorage` (tab-lifetime only) and are cleared when the tab/window closes.
+- On shared devices, clear browser site data after use.
+
+See `SECURITY.md` for disclosure and maintenance guidance.
+
 ## CSP maintenance
 Keep the deployed Content Security Policy in `_headers` as the source of truth (hosting-level enforcement). If `index.html` includes a CSP `<meta http-equiv="Content-Security-Policy">`, it must match `_headers` to avoid policy drift between local previews and production.
 

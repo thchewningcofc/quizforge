@@ -619,7 +619,7 @@ button:focus-visible, a:focus-visible { outline:2px solid var(--accent); outline
         <div class="key-note" id="knote"></div>
         <div class="key-security-warning" id="key-warn-import">
           <span class="ksw-icon">⚠</span>
-          <span>Keys are stored in your browser's localStorage. Avoid using QuizForge on shared or public computers without clearing site data afterward.</span>
+          <span>Keys are kept only for this browser tab (sessionStorage) and cleared when you close it.</span>
         </div>
       </div>
       <button class="btn-big btn-blue" id="btn-k-next" onclick="goImportStep3()">Continue →</button>
@@ -689,7 +689,7 @@ button:focus-visible, a:focus-visible { outline:2px solid var(--accent); outline
         <div class="key-note" id="eg-knote">Free at <a href="https://aistudio.google.com" target="_blank" rel="noopener noreferrer" style="color:var(--gemini)">aistudio.google.com</a> → "Get API key"</div>
         <div class="key-security-warning" id="key-warn-eg">
           <span class="ksw-icon">⚠</span>
-          <span>Key is saved in browser localStorage. Don't use on shared computers without clearing site data afterward.</span>
+          <span>Key is kept only for this browser tab (sessionStorage) and cleared when you close it.</span>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;margin-top:14px">
@@ -761,7 +761,7 @@ button:focus-visible, a:focus-visible { outline:2px solid var(--accent); outline
           <div class="key-note" id="cu-knote">Get yours free at <a href="https://aistudio.google.com" target="_blank" rel="noopener noreferrer" style="color:var(--gemini)">aistudio.google.com</a> → "Get API key"</div>
           <div class="key-security-warning" id="key-warn-cu">
             <span class="ksw-icon">⚠</span>
-            <span>Key is saved in browser localStorage. Don't use on shared computers without clearing site data afterward.</span>
+            <span>Key is kept only for this browser tab (sessionStorage) and cleared when you close it.</span>
           </div>
         </div>
       </div>
@@ -1034,6 +1034,8 @@ function init(){
   pickProvider('smart');
 }
 function saveLib(){localStorage.setItem('qf_decks',JSON.stringify(library.filter(d=>!d.builtin)))}
+function keyStoreGet(provider){return sessionStorage.getItem('qf_key_'+provider)||''}
+function keyStoreSet(provider,key){sessionStorage.setItem('qf_key_'+provider,key)}
 function getMissed(id){return JSON.parse(localStorage.getItem('qf_missed_'+id)||'[]')}
 function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
@@ -1174,7 +1176,7 @@ function setImportStep(n){
     document.getElementById('klabel').textContent=cfg.label||'API Key';
     document.getElementById('api-key').placeholder=cfg.ph||'';
     document.getElementById('knote').innerHTML=cfg.note||'';
-    const saved=localStorage.getItem('qf_key_'+provider);
+    const saved=keyStoreGet(provider);
     document.getElementById('api-key').value=saved||'';
     const btnClass={gemini:'btn-goog',claude:'btn-blue',perp:'btn-blue'}[provider]||'btn-blue';
     document.getElementById('btn-k-next').className='btn-big '+btnClass;
@@ -1195,7 +1197,7 @@ function goImportStep3(){
   if(!key){showErr('Please enter an API key.');return}
   const pfx={gemini:'AIza',claude:'sk-ant',perp:'pplx-'};
   if(pfx[provider]&&!key.startsWith(pfx[provider])){showErr(`Key should start with "${pfx[provider]}"`);return}
-  localStorage.setItem('qf_key_'+provider,key);
+  keyStoreSet(provider,key);
   document.getElementById('err-banner').className='err-banner';
   setImportStep(3);
 }
@@ -1251,17 +1253,17 @@ async function doExtract(){
       if(provider==='gemini'){
         addLog('→ Calling Gemini API…','ig');
         document.getElementById('spinner').style.borderTopColor='var(--gemini)';
-        const key=localStorage.getItem('qf_key_gemini');
+        const key=keyStoreGet('gemini');
         raw=await geminiPdfWithRetry(key,'gemini-2.0-flash',base64,PROMPT,16000,'ptitle','Extracting questions…');
       } else if(provider==='claude'){
         addLog('→ Calling Claude API…','i');
-        const key=localStorage.getItem('qf_key_claude');
+        const key=keyStoreGet('claude');
         const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-opus-4-6',max_tokens:16000,messages:[{role:'user',content:[{type:'document',source:{type:'base64',media_type:'application/pdf',data:base64}},{type:'text',text:PROMPT}]}]})});
         if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error?.message||`Claude error ${res.status}`)}
         const d=await res.json();raw=d.content.map(c=>c.text||'').join('');
       } else {
         addLog('→ Calling Perplexity API…','i');
-        const key=localStorage.getItem('qf_key_perp');
+        const key=keyStoreGet('perp');
         const res=await fetch('https://api.perplexity.ai/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},body:JSON.stringify({model:'sonar-pro',max_tokens:16000,messages:[{role:'user',content:[{type:'file_url',file_url:{url:base64},file_name:selFile.name},{type:'text',text:PROMPT}]}]})});
         if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error?.message||`Perplexity error ${res.status}`)}
         const d=await res.json();raw=d.choices?.[0]?.message?.content||'';
@@ -1568,8 +1570,8 @@ function openCleanup(id){
   document.getElementById('cu-err').className='err-banner';
   cuPickProvider('gemini');
   // Pre-fill saved keys
-  const gk=localStorage.getItem('qf_key_gemini');
-  const ck=localStorage.getItem('qf_key_claude');
+  const gk=keyStoreGet('gemini');
+  const ck=keyStoreGet('claude');
   if(gk)document.getElementById('cu-api-key').value=gk;
   else if(ck){cuPickProvider('claude');document.getElementById('cu-api-key').value=ck;}
   showCuStep('a');
@@ -1610,7 +1612,7 @@ async function startCleanup(){
   if(!key||!key.startsWith(pfx)){
     const b=document.getElementById('cu-err');b.textContent=`Key should start with "${pfx}"`;b.className='err-banner show';return;
   }
-  localStorage.setItem('qf_key_'+cuProvider,key);
+  keyStoreSet(cuProvider,key);
   document.getElementById('cu-err').className='err-banner';
 
   const d=library.find(x=>x.id===cuDeckId);if(!d)return;
@@ -1767,7 +1769,7 @@ function openExplainGen(id){
   document.getElementById('eg-overwrite').checked=false;
   document.getElementById('eg-err').className='err-banner';
   egPickProvider('gemini');
-  const gk=localStorage.getItem('qf_key_gemini'),ck=localStorage.getItem('qf_key_claude');
+  const gk=keyStoreGet('gemini'),ck=keyStoreGet('claude');
   if(gk)document.getElementById('eg-api-key').value=gk;
   else if(ck){egPickProvider('claude');document.getElementById('eg-api-key').value=ck;}
   showEgStep('a');
@@ -1797,7 +1799,7 @@ async function startExplainGen(){
   if(!key||!key.startsWith(pfx)){
     const b=document.getElementById('eg-err');b.textContent=`Key should start with "${pfx}"`;b.className='err-banner show';return;
   }
-  localStorage.setItem('qf_key_'+egProvider,key);
+  keyStoreSet(egProvider,key);
   document.getElementById('eg-err').className='err-banner';
 
   const d=library.find(x=>x.id===egDeckId);if(!d)return;
@@ -1904,8 +1906,8 @@ async function explainOnDemand(){
   const q=qs.questions[qs.cur];
 
   // Check for any saved key
-  const gemKey=localStorage.getItem('qf_key_gemini');
-  const claudeKey=localStorage.getItem('qf_key_claude');
+  const gemKey=keyStoreGet('gemini');
+  const claudeKey=keyStoreGet('claude');
   if(!gemKey&&!claudeKey){
     document.getElementById('explain-key-note').className='explain-key-note show';
     return;
@@ -2307,10 +2309,10 @@ function privacyLearnMore(){
 <!-- PRIVACY NOTICE BANNER -->
 <div id="privacy-banner" role="alertdialog" aria-labelledby="pb-heading" aria-describedby="pb-desc">
   <div class="pb-text">
-    <strong id="pb-heading">QuizForge uses browser localStorage</strong>
-    <span id="pb-desc"> to save your decks, scores, and API keys locally on this device. No data is sent to any server. API keys are transmitted directly to the AI provider you choose (Gemini, Anthropic, or Perplexity) when you use those features. No personal data is collected or stored externally.</span>
+    <strong id="pb-heading">QuizForge stores data in your browser</strong>
+    <span id="pb-desc"> using localStorage for decks/scores and sessionStorage for API keys. API keys are cleared when the tab closes and are only sent directly to the AI provider you choose (Gemini, Anthropic, or Perplexity). QuizForge has no backend.</span>
     <div id="privacy-detail" style="display:none;margin-top:8px;font-size:12px;color:var(--text2);line-height:1.6">
-      <strong style="color:var(--text)">What's stored locally:</strong> quiz decks, scores, missed question lists, AI-generated explanations, and API keys (encrypted at-rest by your OS keystore when available).<br>
+      <strong style="color:var(--text)">What's stored locally:</strong> quiz decks, scores, missed question lists, and AI-generated explanations in <code>localStorage</code>; API keys in <code>sessionStorage</code> only for the current tab.<br>
       <strong style="color:var(--text)">What leaves your device:</strong> only your PDF (to the AI provider you pick) and API prompts. QuizForge has no backend.<br>
       <strong style="color:var(--text)">To delete all data:</strong> open DevTools → Application → Local Storage and clear the <code>qf_*</code> keys, or use Export Decks before clearing.
     </div>
