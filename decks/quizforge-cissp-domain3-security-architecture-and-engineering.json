@@ -1,0 +1,1063 @@
+{
+  "version": 2,
+  "exportedAt": "2026-04-04",
+  "decks": [
+    {
+      "id": "custom_security_architecture_engineering",
+      "name": "CISSP Domain 3: Security Architecture and Engineering",
+      "tag": "ISC2 CISSP · 95 questions",
+      "questions": [
+        {
+          "id": 1,
+          "question": "Matthew is the security administrator for a consulting firm and must enforce access controls that restrict users' access based upon their previous activity. For example, once a consultant accesses data belonging to Acme Cola, a consulting client, they may no longer access data belonging to any of Acme's competitors. What security model BEST fits Matthew's needs?",
+          "options": {
+            "A": "Clark-Wilson",
+            "B": "Biba",
+            "C": "Bell-LaPadula",
+            "D": "Brewer-Nash"
+          },
+          "answer": "D"
+        },
+        {
+          "id": 2,
+          "question": "A temperature-vs-time graph shows the four stages of a fire: Stage 1: Incipient (air ionization), Stage 2: Smoke, Stage 3: Flame, Stage 4: Heat. What is the EARLIEST stage of a fire where it is possible to use detection technology to identify it?",
+          "options": {
+            "A": "Incipient",
+            "B": "Smoke",
+            "C": "Flame",
+            "D": "Heat"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 3,
+          "question": "Ralph is designing a physical security infrastructure for a new computing facility that will remain largely unstaffed. He plans to implement motion detectors in the facility but would also like to include a secondary verification control for physical presence. Which ONE of the following would BEST meet his needs?",
+          "options": {
+            "A": "CCTV",
+            "B": "IPS",
+            "C": "Turnstiles",
+            "D": "Faraday cages"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 4,
+          "question": "Harry would like to retrieve a lost encryption key from a database that uses m of n control, with m = 4 and n = 8. What is the minimum number of escrow agents required to retrieve the key?",
+          "options": {
+            "A": "2",
+            "B": "4",
+            "C": "8",
+            "D": "12"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 5,
+          "question": "Fran's company is considering purchasing a web-based email service from a vendor and eliminating its own email server environment as a cost-saving measure. What type of cloud computing environment is Fran's company considering?",
+          "options": {
+            "A": "SaaS",
+            "B": "IaaS",
+            "C": "CaaS",
+            "D": "PaaS"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 6,
+          "question": "Bob is a security administrator with the U.S. federal government and wants to choose a digital signature approach that is an approved part of the federal Digital Signature Standard under FIPS 186-5. Which ONE of the following encryption algorithms is NOT an acceptable choice for use in digital signatures?",
+          "options": {
+            "A": "EdDSA",
+            "B": "HAVAL",
+            "C": "RSA",
+            "D": "ECDSA"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 7,
+          "question": "Harry would like to access a document owned by Sally and stored on a file server. Applying the subject/object model to this scenario, who or what is the subject of the resource request?",
+          "options": {
+            "A": "Harry",
+            "B": "Sally",
+            "C": "Server",
+            "D": "Document"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 8,
+          "question": "Michael is responsible for forensic investigations and is investigating a medium-severity security incident that involved the defacement of a corporate website. The web server ran on a virtualization platform, and the marketing team would like to get the website up and running as quickly as possible. What would be the MOST reasonable next step for Michael to take?",
+          "options": {
+            "A": "Keep the website offline until the investigation is complete",
+            "B": "Take the virtualization platform offline as evidence",
+            "C": "Take a snapshot of the compromised system and use that for the investigation",
+            "D": "Ignore the incident and focus on quickly restoring the website"
+          },
+          "answer": "C"
+        },
+        {
+          "id": 9,
+          "question": "Helen is a software engineer and is developing code that she would like to restrict to running within an isolated sandbox for security purposes. What software development technique is Helen using?",
+          "options": {
+            "A": "Bounds",
+            "B": "Input validation",
+            "C": "Confinement",
+            "D": "TCB"
+          },
+          "answer": "C"
+        },
+        {
+          "id": 10,
+          "question": "What concept describes the degree of confidence that an organization has that its controls satisfy security requirements?",
+          "options": {
+            "A": "Trust",
+            "B": "Credentialing",
+            "C": "Verification",
+            "D": "Assurance"
+          },
+          "answer": "D"
+        },
+        {
+          "id": 11,
+          "question": "What type of security vulnerability are developers MOST likely to introduce into code when they seek to facilitate their own access, for testing purposes, to software they developed?",
+          "options": {
+            "A": "Maintenance hook",
+            "B": "Cross-site scripting",
+            "C": "SQL injection",
+            "D": "Buffer overflow"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 12,
+          "question": "Sally has a Secret security clearance and attempts to read a data file classified at Confidential. The Biba integrity model blocks her read request (diagram: Sally [Secret] → blocked Read Request → Data File [Confidential]). What principle of the Biba model is being enforced?",
+          "options": {
+            "A": "Simple Security Property",
+            "B": "Simple Integrity Property",
+            "C": "*-Security Property",
+            "D": "*-Integrity Property"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 13,
+          "question": "Tom is responsible for maintaining the security of systems used to control industrial processes located within a power plant. What term is used to describe these systems?",
+          "options": {
+            "A": "POWER",
+            "B": "SCADA",
+            "C": "HAVAL",
+            "D": "COBOL"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 14,
+          "question": "Sonia recently removed an encrypted hard drive from a laptop and moved it to a new device because of a hardware failure. She is having difficulty accessing encrypted content on the drive despite knowing the user's password. What hardware security feature is likely causing this problem?",
+          "options": {
+            "A": "TCB",
+            "B": "TPM",
+            "C": "NIACAP",
+            "D": "RSA"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 15,
+          "question": "Chris wants to verify that a software package he downloaded matches the original version. What hashing tool should he use if he believes that technically sophisticated attackers may have replaced the software package with a version containing a backdoor? (Note: For questions 16–19, Alice and Bob use an asymmetric cryptosystem with certificates from a mutually trusted CA.)",
+          "options": {
+            "A": "MD5",
+            "B": "3DES",
+            "C": "SHA1",
+            "D": "SHA 256"
+          },
+          "answer": "D"
+        },
+        {
+          "id": 16,
+          "question": "[Scenario: Alice and Bob use an asymmetric cryptosystem; they exchanged keys via digital certificates from a mutually trusted CA.] If Alice wants to send Bob a message that is encrypted for confidentiality, what key does she use to encrypt the message?",
+          "options": {
+            "A": "Alice's public key",
+            "B": "Alice's private key",
+            "C": "Bob's public key",
+            "D": "Bob's private key"
+          },
+          "answer": "C"
+        },
+        {
+          "id": 17,
+          "question": "[Scenario: Alice and Bob use an asymmetric cryptosystem; they exchanged keys via digital certificates from a mutually trusted CA.] When Bob receives the encrypted message from Alice, what key does he use to decrypt the message's plaintext content?",
+          "options": {
+            "A": "Alice's public key",
+            "B": "Alice's private key",
+            "C": "Bob's public key",
+            "D": "Bob's private key"
+          },
+          "answer": "D"
+        },
+        {
+          "id": 18,
+          "question": "[Scenario: Alice and Bob use an asymmetric cryptosystem; they exchanged keys via digital certificates from a mutually trusted CA.] Which ONE of the following keys would Bob NOT possess in this scenario?",
+          "options": {
+            "A": "Alice's public key",
+            "B": "Alice's private key",
+            "C": "Bob's public key",
+            "D": "Bob's private key"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 19,
+          "question": "[Scenario: Alice and Bob use an asymmetric cryptosystem; they exchanged keys via digital certificates from a mutually trusted CA.] Alice would also like to digitally sign the message that she sends to Bob. What key should she use to create the digital signature?",
+          "options": {
+            "A": "Alice's public key",
+            "B": "Alice's private key",
+            "C": "Bob's public key",
+            "D": "Bob's private key"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 20,
+          "question": "What name is given to the random value added to a password in an attempt to defeat rainbow table attacks?",
+          "options": {
+            "A": "Hash",
+            "B": "Salt",
+            "C": "Extender",
+            "D": "Rebar"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 21,
+          "question": "Which ONE of the following is NOT an attribute of a typical hashing algorithm?",
+          "options": {
+            "A": "They require a cryptographic key",
+            "B": "They are irreversible",
+            "C": "It is very difficult to find two messages with the same hash value",
+            "D": "They take variable-length input"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 22,
+          "question": "What type of fire suppression system fills with water after a valve opens when the initial stages of a fire are detected and then requires a sprinkler head heat activation before dispensing water?",
+          "options": {
+            "A": "Wet pipe",
+            "B": "Dry pipe",
+            "C": "Deluge",
+            "D": "Preaction"
+          },
+          "answer": "D"
+        },
+        {
+          "id": 23,
+          "question": "Susan would like to configure IPsec in a manner that provides confidentiality for the content of packets. What component of IPsec provides this capability?",
+          "options": {
+            "A": "AH",
+            "B": "ESP",
+            "C": "IKE",
+            "D": "ISAKMP"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 24,
+          "question": "Which ONE of the following cryptographic goals protects against the risks posed when a device is lost or stolen?",
+          "options": {
+            "A": "Nonrepudiation",
+            "B": "Authentication",
+            "C": "Integrity",
+            "D": "Confidentiality"
+          },
+          "answer": "D"
+        },
+        {
+          "id": 25,
+          "question": "Joanna wants to review the status of the industrial control systems her organization uses for building control. What type of systems should she inquire about access to?",
+          "options": {
+            "A": "SCADA",
+            "B": "DSS",
+            "C": "BAS",
+            "D": "ICS-CSS"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 26,
+          "question": "Harry has a Secret security clearance and attempts to write to a data file classified at Confidential. The Bell-LaPadula model blocks his write request (diagram: Harry [Secret] → blocked Write Request → Data File [Confidential]). What principle of the Bell-LaPadula model blocked this request?",
+          "options": {
+            "A": "Simple Security Property",
+            "B": "Simple Integrity Property",
+            "C": "*-Security Property",
+            "D": "Discretionary Security Property"
+          },
+          "answer": "C"
+        },
+        {
+          "id": 27,
+          "question": "Florian and Tobias would like to begin communicating using a symmetric cryptosystem, but they have no prearranged secret and are not able to meet in person to exchange keys. What algorithm can they use to securely exchange the secret key?",
+          "options": {
+            "A": "IDEA",
+            "B": "Diffie-Hellman",
+            "C": "RSA",
+            "D": "MD5"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 28,
+          "question": "Carl's organization recently underwent a user access review. At the conclusion of the review, the auditors noted several cases of privilege creep. What security principle was violated?",
+          "options": {
+            "A": "Fail securely",
+            "B": "Keep it simple and secure",
+            "C": "Trust but verify",
+            "D": "Least privilege"
+          },
+          "answer": "D"
+        },
+        {
+          "id": 29,
+          "question": "Matt's organization recently adopted a zero trust network architecture. Under this approach, which ONE of the following criteria would be LEAST appropriate to use when granting a subject access to resources?",
+          "options": {
+            "A": "Password",
+            "B": "Two-factor authentication",
+            "C": "IP address",
+            "D": "Biometric scan"
+          },
+          "answer": "C"
+        },
+        {
+          "id": 30,
+          "question": "Colin is the chief privacy officer for a nonprofit organization assisting with a transition to a Privacy by Design approach. Under this approach, which is NOT one of the Privacy by Design principles?",
+          "options": {
+            "A": "Proactive, not reactive",
+            "B": "Privacy as the default setting",
+            "C": "End-to-end security",
+            "D": "Defense in depth"
+          },
+          "answer": "D"
+        },
+        {
+          "id": 31,
+          "question": "What cryptographic principle stands behind the idea that cryptographic algorithms should be open to public inspection?",
+          "options": {
+            "A": "Security through obscurity",
+            "B": "Kerckhoffs' principle",
+            "C": "Defense in depth",
+            "D": "Heisenburg principle"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 32,
+          "question": "Ryan is developing a physical access plan for his organization's data center. A diagram of the building shows an arrow pointing to a small structure at the entrance gate between two sets of doors. What is the name of this control?",
+          "options": {
+            "A": "Access control vestibule",
+            "B": "Turnstile",
+            "C": "Intrusion prevention system",
+            "D": "Portal"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 33,
+          "question": "Which ONE of the following does NOT describe a standard physical security requirement for wiring closets?",
+          "options": {
+            "A": "Place only in areas monitored by security guards",
+            "B": "Do not store flammable items in the closet",
+            "C": "Use sensors on doors to log entries",
+            "D": "Perform regular inspections of the closet"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 34,
+          "question": "Sally has a Secret security clearance and attempts to write to a data file classified Top Secret. The Biba integrity model blocks her write request (diagram: Sally [Secret] → blocked Write Request → Data File [Top Secret]). What principle is preventing her from writing to the file?",
+          "options": {
+            "A": "Simple Security Property",
+            "B": "Simple Integrity Property",
+            "C": "*-Security Property",
+            "D": "*-Integrity Property"
+          },
+          "answer": "D"
+        },
+        {
+          "id": 35,
+          "question": "Lana recently implemented a new process in her organization where managers who are responsible for granting users access to a system are NOT permitted to participate in access reviews. What principle is she enforcing?",
+          "options": {
+            "A": "Two-person control",
+            "B": "Least privilege",
+            "C": "Privilege creep",
+            "D": "Segregation of duties"
+          },
+          "answer": "D"
+        },
+        {
+          "id": 36,
+          "question": "Which ONE of the following statements about system development is NOT correct?",
+          "options": {
+            "A": "Systems should be designed to operate in a secure manner if the user performs no other configuration",
+            "B": "Systems should be designed to fall back to a secure state if they experience an error",
+            "C": "Systems should be designed to incorporate security as a design feature",
+            "D": "Systems should NOT be designed in a manner that keeps their functionality as simple as possible"
+          },
+          "answer": "D"
+        },
+        {
+          "id": 37,
+          "question": "Alan is reviewing a system that has been assigned the EAL1 evaluation assurance level under the Common Criteria. What is the degree of assurance that he may have about the system?",
+          "options": {
+            "A": "It has been functionally tested",
+            "B": "It has been structurally tested",
+            "C": "It has been formally verified, designed, and tested",
+            "D": "It has been methodically designed, tested, and reviewed"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 38,
+          "question": "Jake works for a research organization seeking to deploy a grid computing system that will perform cycle scavenging on user workstations. What is the MOST significant risk associated with this operation?",
+          "options": {
+            "A": "Data confidentiality",
+            "B": "Isolation breach",
+            "C": "Data integrity",
+            "D": "Data availability"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 39,
+          "question": "Eimear's software development team uses an approach that creates many discrete software objects and then binds them together using APIs. What term BEST describes this architecture?",
+          "options": {
+            "A": "Microservices",
+            "B": "Function-as-a-service",
+            "C": "Containerization",
+            "D": "Virtualization"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 40,
+          "question": "Adam recently configured permissions on an NTFS filesystem to describe the access that different users may have to a file by listing each user individually. What did Adam create?",
+          "options": {
+            "A": "An access control list",
+            "B": "An access control entry",
+            "C": "Role-based access control",
+            "D": "Mandatory access control"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 41,
+          "question": "Betty is concerned about the use of buffer overflow attacks against a custom application developed for use in her organization. What security control would provide the STRONGEST defense against these attacks?",
+          "options": {
+            "A": "Firewall",
+            "B": "Intrusion detection system",
+            "C": "Parameter checking",
+            "D": "Vulnerability scanning"
+          },
+          "answer": "C"
+        },
+        {
+          "id": 42,
+          "question": "Which ONE of the following combinations of controls BEST embodies the defense-in-depth principle?",
+          "options": {
+            "A": "Encryption of email and network intrusion detection",
+            "B": "Cloud access security brokers (CASBs) and security awareness training",
+            "C": "Data loss prevention and multifactor authentication",
+            "D": "Network firewall and host firewall"
+          },
+          "answer": "D"
+        },
+        {
+          "id": 43,
+          "question": "James is working with a Department of Defense system that is authorized to simultaneously handle information classified at the Secret and Top Secret levels. What type of system is he using?",
+          "options": {
+            "A": "Single state",
+            "B": "Unclassified",
+            "C": "Compartmented",
+            "D": "Multistate"
+          },
+          "answer": "D"
+        },
+        {
+          "id": 44,
+          "question": "Kyle is being granted access to a military computer system that uses System High mode. What is NOT true about Kyle's security clearance requirements?",
+          "options": {
+            "A": "Kyle must have a clearance for the highest level of classification processed by the system, regardless of his access",
+            "B": "Kyle must have access approval for all information processed by the system",
+            "C": "Kyle must have a valid need to know for all information processed by the system",
+            "D": "Kyle must have a valid security clearance"
+          },
+          "answer": "C"
+        },
+        {
+          "id": 45,
+          "question": "Gary intercepts a communication and suspects secret messages are being exchanged. The communication appears to be a photograph of a seashore with people and a ship (an ordinary-looking image). What type of technique may the individuals use to hide messages inside this image?",
+          "options": {
+            "A": "Visual cryptography",
+            "B": "Steganography",
+            "C": "Cryptographic hashing",
+            "D": "Transport layer security"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 46,
+          "question": "Philip is developing a new security tool to be used by individuals in many different subsidiaries of his organization. He chooses to use Docker to deploy the tool to simplify configuration. What term BEST describes this approach?",
+          "options": {
+            "A": "Virtualization",
+            "B": "Abstraction",
+            "C": "Simplification",
+            "D": "Containerization"
+          },
+          "answer": "D"
+        },
+        {
+          "id": 47,
+          "question": "A diagram shows four concentric circles labeled Ring 0 (center), Ring 1, Ring 2, and Ring 3 (outermost) representing the ring protection model. What ring contains the operating system's kernel?",
+          "options": {
+            "A": "Ring 0",
+            "B": "Ring 1",
+            "C": "Ring 2",
+            "D": "Ring 3"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 48,
+          "question": "In an infrastructure-as-a-service environment where a vendor supplies a customer with access to storage services, who is normally responsible for removing sensitive data from drives that are taken out of service?",
+          "options": {
+            "A": "Customer's security team",
+            "B": "Customer's storage team",
+            "C": "Customer's vendor management team",
+            "D": "Vendor"
+          },
+          "answer": "D"
+        },
+        {
+          "id": 49,
+          "question": "During a system audit, Casey notices that the private key for her organization's web server has been stored in a public Amazon S3 storage bucket for more than a year. Which ONE of the following actions should she take FIRST?",
+          "options": {
+            "A": "Remove the key from the bucket",
+            "B": "Notify all customers that their data may have been exposed",
+            "C": "Request a new certificate using a new key",
+            "D": "Nothing, because the private key should be accessible for validation"
+          },
+          "answer": "C"
+        },
+        {
+          "id": 50,
+          "question": "Which ONE of the following systems assurance processes provides an independent third-party evaluation of a system's controls that may be trusted by many different organizations?",
+          "options": {
+            "A": "Certification",
+            "B": "Definition",
+            "C": "Verification",
+            "D": "Accreditation"
+          },
+          "answer": "C"
+        },
+        {
+          "id": 51,
+          "question": "Darcy's organization is deploying serverless computing technology. In a serverless model, who is normally responsible for configuring operating system security controls?",
+          "options": {
+            "A": "Software developer",
+            "B": "Cybersecurity professional",
+            "C": "Cloud architect",
+            "D": "Vendor"
+          },
+          "answer": "D"
+        },
+        {
+          "id": 52,
+          "question": "Harold is assessing the susceptibility of his environment to hardware failures and would like to identify the expected lifetime of a piece of hardware. What measure should he use for this?",
+          "options": {
+            "A": "MTTR",
+            "B": "MTTF",
+            "C": "RTO",
+            "D": "MTO"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 53,
+          "question": "Chris is designing a cryptographic system for a company with 1,000 employees using an asymmetric encryption system, set up so that any pair of arbitrary users may communicate privately. How many total keys will they need?",
+          "options": {
+            "A": "500",
+            "B": "1,000",
+            "C": "2,000",
+            "D": "499,500"
+          },
+          "answer": "C"
+        },
+        {
+          "id": 54,
+          "question": "Gary is concerned about applying consistent security settings to the many mobile devices used throughout his organization. What technology would BEST assist with this challenge?",
+          "options": {
+            "A": "MDM",
+            "B": "IPS",
+            "C": "IDS",
+            "D": "SIEM"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 55,
+          "question": "Alice sent a message to Bob. Bob would like to demonstrate to Charlie that the message he received definitely came from Alice. What goal of cryptography is Bob attempting to achieve?",
+          "options": {
+            "A": "Authentication",
+            "B": "Confidentiality",
+            "C": "Nonrepudiation",
+            "D": "Integrity"
+          },
+          "answer": "C"
+        },
+        {
+          "id": 56,
+          "question": "Rhonda is considering new identification cards for physical access control. She comes across a military card showing a photo, name, rank, and expiration date with a visible embedded chip beneath a flag logo. What type of card is this?",
+          "options": {
+            "A": "Smart card",
+            "B": "Proximity card",
+            "C": "Magnetic stripe card",
+            "D": "Phase three card"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 57,
+          "question": "Gordon is concerned that hackers may be able to use the Van Eck radiation phenomenon to remotely read the contents of computer monitors in a restricted work area. What technology would protect against this type of attack?",
+          "options": {
+            "A": "TCSEC",
+            "B": "SCSI",
+            "C": "GHOST",
+            "D": "TEMPEST"
+          },
+          "answer": "D"
+        },
+        {
+          "id": 58,
+          "question": "Jorge believes that an attacker has obtained the hash of the Kerberos service account from one of his organization's Active Directory servers. What type of attack would this enable?",
+          "options": {
+            "A": "Golden ticket",
+            "B": "Kerberoasting",
+            "C": "Pass the ticket",
+            "D": "Brute force"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 59,
+          "question": "Sherry conducted an inventory of the cryptographic technologies in use within her organization and found the following in use: MD5, AES, PGP, and WPA3. Which ONE of these technologies should she replace because it is no longer considered secure?",
+          "options": {
+            "A": "MD5",
+            "B": "AES",
+            "C": "PGP",
+            "D": "WPA3"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 60,
+          "question": "Robert is investigating a security breach and discovers the Mimikatz tool installed on a system in his environment. What type of attack has likely taken place?",
+          "options": {
+            "A": "Password cracking",
+            "B": "Pass the hash",
+            "C": "MAC spoofing",
+            "D": "ARP poisoning"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 61,
+          "question": "Tom is a cryptanalyst working on breaking a cryptographic algorithm's secret key. He has a copy of an intercepted encrypted message and also a copy of its decrypted plaintext. He wants to use both to retrieve the secret key. What type of attack is Tom engaging in?",
+          "options": {
+            "A": "Chosen ciphertext",
+            "B": "Chosen plaintext",
+            "C": "Known plaintext",
+            "D": "Brute force"
+          },
+          "answer": "C"
+        },
+        {
+          "id": 62,
+          "question": "A hacker violated the integrity of data in James's company by waiting until James verified the integrity of a file using a hash value and then modifying the file between the time James verified the integrity and read the contents of the file. What type of attack took place?",
+          "options": {
+            "A": "Social engineering",
+            "B": "TOCTOU",
+            "C": "Data diddling",
+            "D": "Parameter checking"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 63,
+          "question": "Carl is deploying video sensors in remote locations and, because of connectivity limitations, would like to perform as much image processing and computation as possible on the device itself before sending results to the cloud. What computing model would BEST meet his needs?",
+          "options": {
+            "A": "Serverless computing",
+            "B": "Edge computing",
+            "C": "IaaS computing",
+            "D": "SaaS computing"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 64,
+          "question": "What action can you take to prevent accidental data disclosure due to wear leveling on an SSD device before reusing the drive?",
+          "options": {
+            "A": "Reformatting",
+            "B": "Disk encryption",
+            "C": "Degaussing",
+            "D": "Physical destruction"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 65,
+          "question": "A shipping clerk at Johnson Widgets pulled all individual sales records for a quarter from the database and totaled them to determine total sales volume — information classified as a competitive secret. What type of attack occurred?",
+          "options": {
+            "A": "Social engineering",
+            "B": "Inference",
+            "C": "Aggregation",
+            "D": "Data diddling"
+          },
+          "answer": "C"
+        },
+        {
+          "id": 66,
+          "question": "What physical security control broadcasts false emanations constantly to mask the presence of true electromagnetic emanations from computing equipment?",
+          "options": {
+            "A": "Faraday cage",
+            "B": "Copper-infused windows",
+            "C": "Shielded cabling",
+            "D": "White noise"
+          },
+          "answer": "D"
+        },
+        {
+          "id": 67,
+          "question": "In a software-as-a-service cloud computing environment, who is normally responsible for ensuring that appropriate firewall controls are in place to protect the application?",
+          "options": {
+            "A": "Customer's security team",
+            "B": "Vendor",
+            "C": "Customer's networking team",
+            "D": "Customer's infrastructure management team"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 68,
+          "question": "Alice has read permissions on an object, and she would like Bob to have those same rights. Which ONE of the rules in the Take-Grant protection model would allow her to complete this operation?",
+          "options": {
+            "A": "Create rule",
+            "B": "Remove rule",
+            "C": "Grant rule",
+            "D": "Take rule"
+          },
+          "answer": "C"
+        },
+        {
+          "id": 69,
+          "question": "Charles securely wipes a compromised machine, reinstalls the OS from original media, fully patches it, and applies security templates before reconnecting to the network. Almost immediately, it reconnects to the same botnet. Where should Charles look for the malware causing this behavior?",
+          "options": {
+            "A": "The operating system partition",
+            "B": "The system BIOS or firmware",
+            "C": "The system memory",
+            "D": "The installation media"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 70,
+          "question": "Lauren implements ASLR to help prevent system compromises. What technique has she used to protect her system?",
+          "options": {
+            "A": "Encryption",
+            "B": "Mandatory access control",
+            "C": "Memory address randomization",
+            "D": "Discretionary access control"
+          },
+          "answer": "C"
+        },
+        {
+          "id": 71,
+          "question": "Alan intercepts an encrypted message and performs frequency analysis, noting that the frequency of letters in the message closely matches the distribution of letters in the English language. What type of cipher was MOST likely used to create this message?",
+          "options": {
+            "A": "Substitution cipher",
+            "B": "AES",
+            "C": "Transposition cipher",
+            "D": "3DES"
+          },
+          "answer": "C"
+        },
+        {
+          "id": 72,
+          "question": "In a zero trust network architecture, what component is responsible for making policy decisions based upon rules and external data sources?",
+          "options": {
+            "A": "Policy engine",
+            "B": "Policy administrator",
+            "C": "Policy enforcement point",
+            "D": "Subject"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 73,
+          "question": "Grace would like to implement application control technology in her organization. Users often need to install new applications for research and testing but she wants to block known malicious software. What type of application control would be MOST appropriate?",
+          "options": {
+            "A": "Blacklisting",
+            "B": "Graylisting",
+            "C": "Whitelisting",
+            "D": "Bluelisting"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 74,
+          "question": "Warren is designing a physical intrusion detection system for a sensitive media storage facility and wants to include technology that issues an alert if the communications lines for the alarm system are unexpectedly cut. What technology would meet this requirement?",
+          "options": {
+            "A": "Heartbeat sensor",
+            "B": "Emanation security",
+            "C": "Motion detector",
+            "D": "Faraday cage"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 75,
+          "question": "John and Gary are negotiating a business transaction, and John must demonstrate to Gary that he has access to a system. A diagram shows a person entering a circular path with two routes separated by a wall with a door, illustrating the 'magic door' scenario. What technique is John using?",
+          "options": {
+            "A": "Split-knowledge proof",
+            "B": "Zero-knowledge proof",
+            "C": "Logical proof",
+            "D": "Mathematical proof"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 76,
+          "question": "After scanning his wireless network, Mike finds an original iPad running a massively out-of-date version of iOS that cannot be updated to a current secure version. What would be the BEST option for handling this device?",
+          "options": {
+            "A": "Retire or replace the device",
+            "B": "Isolate the device on a dedicated wireless network",
+            "C": "Install a firewall on the tablet",
+            "D": "Reinstall the OS"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 77,
+          "question": "Tonya believes that an attacker eavesdropped on legitimate HTTPS communications by first engaging in a DNS poisoning attack. After conducting DNS poisoning, what technique would an attacker MOST likely use to conduct this eavesdropping?",
+          "options": {
+            "A": "Man-in-the-middle",
+            "B": "Brute-force",
+            "C": "Timing",
+            "D": "Meet-in-the-middle"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 78,
+          "question": "Howard is choosing a cryptographic algorithm for his organization and would like to choose an algorithm that supports the creation of digital signatures. Which ONE of the following algorithms would meet his requirement?",
+          "options": {
+            "A": "RSA",
+            "B": "3DES",
+            "C": "AES",
+            "D": "Blowfish"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 79,
+          "question": "Laura is responsible for securing her company's web-based applications and wants to conduct an educational program for developers on common web application security vulnerabilities. Where can she turn for a concise listing of the MOST common web application issues?",
+          "options": {
+            "A": "CVE",
+            "B": "NSA",
+            "C": "OWASP",
+            "D": "CSA"
+          },
+          "answer": "C"
+        },
+        {
+          "id": 80,
+          "question": "The Bell-LaPadula and Biba models implement state machines in a fashion that uses what specific state machine model?",
+          "options": {
+            "A": "Information flow",
+            "B": "Noninterference",
+            "C": "Cascading",
+            "D": "Feedback"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 81,
+          "question": "During a third-party vulnerability scan, Danielle's employer discovered that embedded systems managing their new buildings have a severe remote access vulnerability. The manufacturer has gone out of business with no patch available. What should Danielle MOST reasonably recommend?",
+          "options": {
+            "A": "Identify a replacement device model and replace every device",
+            "B": "Turn off all of the devices",
+            "C": "Move the devices to a secure and isolated network segment",
+            "D": "Reverse engineer the devices and build an in-house patch"
+          },
+          "answer": "C"
+        },
+        {
+          "id": 82,
+          "question": "What type of motion detector senses changes in the electromagnetic fields in monitored areas?",
+          "options": {
+            "A": "Infrared",
+            "B": "Wave pattern",
+            "C": "Capacitance",
+            "D": "Photoelectric"
+          },
+          "answer": "C"
+        },
+        {
+          "id": 83,
+          "question": "Mike has been tasked with preventing an outbreak of malware like Mirai, a botnet that targeted IP-based cameras and routers. What type of systems should be protected in his organization?",
+          "options": {
+            "A": "Servers",
+            "B": "SCADA",
+            "C": "Mobile devices",
+            "D": "Internet of Things (IoT) devices"
+          },
+          "answer": "D"
+        },
+        {
+          "id": 84,
+          "question": "Which ONE of the following statements is correct about the Biba model of access control?",
+          "options": {
+            "A": "It addresses confidentiality and integrity",
+            "B": "It addresses integrity and availability",
+            "C": "It prevents covert channel attacks",
+            "D": "It focuses on protecting objects from integrity threats"
+          },
+          "answer": "D"
+        },
+        {
+          "id": 85,
+          "question": "In Transport Layer Security, what type of key is used to encrypt the actual content of communications between a web server and a client?",
+          "options": {
+            "A": "Ephemeral session key",
+            "B": "Client's public key",
+            "C": "Server's public key",
+            "D": "Server's private key"
+          },
+          "answer": "A"
+        },
+        {
+          "id": 86,
+          "question": "Beth would like to include technology in a secure area of her data center to protect against unwanted electromagnetic emanations. What technology would BEST assist her with this goal?",
+          "options": {
+            "A": "Heartbeat sensor",
+            "B": "Faraday cage",
+            "C": "Piggybacking",
+            "D": "WPA2"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 87,
+          "question": "In a virtualized computing environment, what component is responsible for enforcing separation between guest machines?",
+          "options": {
+            "A": "Guest operating system",
+            "B": "Hypervisor",
+            "C": "Kernel",
+            "D": "Protection manager"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 88,
+          "question": "Rick is an application developer who works primarily in Python. He recently decided to evaluate a new service where he provides his Python code to a vendor who then executes it on their server environment. What type of cloud computing environment is this service?",
+          "options": {
+            "A": "SaaS",
+            "B": "PaaS",
+            "C": "IaaS",
+            "D": "CaaS"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 89,
+          "question": "A component failure in the primary HVAC system leads to a high temperature alarm in Kim's data center. After resolving the issue, what should Kim consider to BEST prevent future issues like this?",
+          "options": {
+            "A": "A closed loop chiller",
+            "B": "Redundant cooling systems",
+            "C": "Swamp coolers",
+            "D": "Relocating the data center to a colder climate"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 90,
+          "question": "Tommy is planning to implement a power conditioning UPS for a rack of servers. Which ONE of the following conditions will the UPS be UNABLE to protect against if it persists for an extended period of time?",
+          "options": {
+            "A": "Fault",
+            "B": "Blackout",
+            "C": "Sag",
+            "D": "Noise"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 91,
+          "question": "Which ONE of the following humidity values is within the acceptable range for a data center operation?",
+          "options": {
+            "A": "0%",
+            "B": "10%",
+            "C": "15%",
+            "D": "40%"
+          },
+          "answer": "D"
+        },
+        {
+          "id": 92,
+          "question": "Kristen's organization suffered a ransomware infection. Which ONE of the following statements about paying the ransom is NOT correct?",
+          "options": {
+            "A": "Payment of the ransom may be illegal",
+            "B": "Payment of the ransom may result in further demands for payments",
+            "C": "Payment of the ransom guarantees access to the decryption key",
+            "D": "Payment of the ransom may cause a data breach"
+          },
+          "answer": "C"
+        },
+        {
+          "id": 93,
+          "question": "Alex's employer creates most of their work output as PDF files. Alex is concerned about limiting the audience for the PDF files to those individuals who have paid for them. What technology can he use to MOST effectively control the access to and distribution of these files?",
+          "options": {
+            "A": "EDM",
+            "B": "Encryption",
+            "C": "Digital signatures",
+            "D": "DRM"
+          },
+          "answer": "D"
+        },
+        {
+          "id": 94,
+          "question": "As part of his team's forensic investigation process, Matt signs out drives and other evidence from an evidence storage facility before working with them. What type of documentation is he creating?",
+          "options": {
+            "A": "Criminal",
+            "B": "Chain of custody",
+            "C": "Civil",
+            "D": "CYA"
+          },
+          "answer": "B"
+        },
+        {
+          "id": 95,
+          "question": "Todd believes that a digital certificate used by his organization has been compromised, and he wants to add it to the certificate revocation list (CRL). What element of the certificate goes on the CRL?",
+          "options": {
+            "A": "Serial number",
+            "B": "Public key",
+            "C": "Subject name",
+            "D": "Expiration date"
+          },
+          "answer": "A"
+        }
+      ],
+      "builtin": false,
+      "provider": "manual",
+      "_best": null,
+      "_missed": [],
+      "_sessions": "0"
+    }
+  ]
+}
