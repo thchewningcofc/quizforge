@@ -90,6 +90,12 @@ body::after {
 .hero p { font-size:16px; color:var(--text2); line-height:1.6; max-width:520px; }
 .section-label { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:20px; display:flex; align-items:center; gap:12px; }
 .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+.deck-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+.deck-controls { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.deck-control-label { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1px; color:var(--text2); text-transform:uppercase; }
+.deck-sort { background:var(--surface2); border:1px solid var(--border2); color:var(--text); border-radius:8px; padding:6px 10px; font-size:12px; font-family:'Outfit',sans-serif; }
+.deck-toggle { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text2); }
+.deck-toggle input { accent-color:var(--accent); }
 .deck-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin-bottom:32px; }
 .deck-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:24px; transition:all 0.2s; position:relative; overflow:hidden; display:flex; flex-direction:column; gap:12px; }
 .deck-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent),var(--a2)); opacity:0; transition:opacity 0.2s; }
@@ -480,6 +486,7 @@ button:focus-visible, a:focus-visible { outline:2px solid var(--accent); outline
   .hero h1 { font-size:24px; }
   .lib-topbar { padding:12px 16px; flex-wrap:wrap; gap:8px; }
   .btn-data { font-size:11px; padding:7px 10px; }
+  .deck-toolbar { margin-bottom:10px; }
   .deck-actions-secondary { gap:5px; }
   .btn-sm { font-size:12px; padding:7px 9px; }
   .opt { padding:13px 14px; }
@@ -566,7 +573,22 @@ button:focus-visible, a:focus-visible { outline:2px solid var(--accent); outline
     <h1>Study smarter —<br><em>no API key needed</em></h1>
     <p>Drop any PDF. Smart Parse works instantly in your browser with zero accounts. Google Gemini is free with just a Google login.</p>
   </div>
-  <div class="section-label">Your Decks</div>
+  <div class="deck-toolbar">
+    <div class="section-label">Your Decks</div>
+    <div class="deck-controls" role="group" aria-label="Deck sorting options">
+      <label for="deck-sort" class="deck-control-label">Sort</label>
+      <select id="deck-sort" class="deck-sort" onchange="setDeckSort(this.value)" aria-label="Sort deck cards">
+        <option value="domain">Domain order</option>
+        <option value="name">Name (A-Z)</option>
+        <option value="questions">Question count</option>
+        <option value="recent">Recently added</option>
+      </select>
+      <label class="deck-toggle">
+        <input id="deck-hide-dupes" type="checkbox" onchange="setHideDeckDuplicates(this.checked)" checked>
+        Hide duplicates
+      </label>
+    </div>
+  </div>
   <div class="deck-grid" id="deck-grid"></div>
 </div>
 
@@ -1029,6 +1051,80 @@ function validateCisspData(data){
 
 let library=[],activeDeck=null,qs={},timerInt=null,provider='smart',selFile=null;
 let isParsing=false,globalListenersBound=false;
+let deckSort='domain';
+let hideDeckDupes=true;
+
+function parseDomainNumber(deck){
+  const source=`${deck?.name||''} ${deck?.tag||''}`;
+  const m=source.match(/domain\s*(\d+)/i);
+  return m?parseInt(m[1],10):null;
+}
+
+function normalizeDeckKey(deck){
+  const domain=parseDomainNumber(deck);
+  if(Number.isInteger(domain)) return `domain-${domain}`;
+  const normalized=String(deck?.name||'')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+  return normalized?`name-${normalized}`:`id-${deck?.id||''}`;
+}
+
+function deckQualityScore(deck){
+  const explCount=Array.isArray(deck?.questions)?deck.questions.filter(q=>q.explanation).length:0;
+  return (deck?.builtin?1000000:0)+(explCount*1000)+(deck?.questions?.length||0);
+}
+
+function compareDecksBySort(a,b){
+  if(deckSort==='recent'){
+    return String(b.id||'').localeCompare(String(a.id||''));
+  }
+  if(deckSort==='questions'){
+    const byCount=(b.questions?.length||0)-(a.questions?.length||0);
+    if(byCount!==0) return byCount;
+  }
+  if(deckSort==='name'){
+    const byName=String(a.name||'').localeCompare(String(b.name||''),undefined,{numeric:true,sensitivity:'base'});
+    if(byName!==0) return byName;
+  }
+  // default domain-aware sort
+  const da=parseDomainNumber(a);
+  const db=parseDomainNumber(b);
+  if(da!==null && db!==null && da!==db) return da-db;
+  if(da!==null && db===null) return -1;
+  if(da===null && db!==null) return 1;
+  const byName=String(a.name||'').localeCompare(String(b.name||''),undefined,{numeric:true,sensitivity:'base'});
+  if(byName!==0) return byName;
+  return String(a.id||'').localeCompare(String(b.id||''),undefined,{numeric:true,sensitivity:'base'});
+}
+
+function getLibraryView(){
+  const decks=[...library];
+  if(!hideDeckDupes) return decks.sort(compareDecksBySort);
+
+  const bestByKey=new Map();
+  decks.forEach(deck=>{
+    const key=normalizeDeckKey(deck);
+    const current=bestByKey.get(key);
+    if(!current || deckQualityScore(deck)>deckQualityScore(current)){
+      bestByKey.set(key,deck);
+    }
+  });
+  return [...bestByKey.values()].sort(compareDecksBySort);
+}
+
+function setDeckSort(value){
+  deckSort=['domain','name','questions','recent'].includes(value)?value:'domain';
+  localStorage.setItem('qf_deck_sort',deckSort);
+  renderLib();
+}
+
+function setHideDeckDuplicates(value){
+  hideDeckDupes=Boolean(value);
+  localStorage.setItem('qf_hide_dupes',hideDeckDupes?'1':'0');
+  renderLib();
+}
 
 function init(){
   const cisspValidation=validateCisspData(CISSP_DATA);
@@ -1039,7 +1135,16 @@ function init(){
 
   const stored=JSON.parse(localStorage.getItem('qf_decks')||'[]');
   const builtinDecks=cisspValidation.ok?BUILTIN:[];
+  const savedSort=localStorage.getItem('qf_deck_sort');
+  if(savedSort) deckSort=savedSort;
+  const savedHideDupes=localStorage.getItem('qf_hide_dupes');
+  if(savedHideDupes!==null) hideDeckDupes=savedHideDupes==='1';
+
   library=[...builtinDecks,...stored];
+  const sortSelect=document.getElementById('deck-sort');
+  if(sortSelect) sortSelect.value=deckSort;
+  const hideDupesCheckbox=document.getElementById('deck-hide-dupes');
+  if(hideDupesCheckbox) hideDupesCheckbox.checked=hideDeckDupes;
   bindGlobalListeners();
   renderLib();
   pickProvider('smart');
@@ -1056,7 +1161,8 @@ function renderLib(){
   if(!g)return;
   g.replaceChildren();
   let h='';
-  library.forEach(d=>{
+  const decks=getLibraryView();
+  decks.forEach(d=>{
     const missed=getMissed(d.id);
     const best=localStorage.getItem('qf_best_'+d.id);
     const explCount=d.questions.filter(q=>q.explanation).length;
