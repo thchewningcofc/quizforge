@@ -1117,13 +1117,13 @@ function getLibraryView(){
 
 function setDeckSort(value){
   deckSort=['domain','name','questions','recent'].includes(value)?value:'domain';
-  localStorage.setItem('qf_deck_sort',deckSort);
+  safeStorageSet(localStorage,'qf_deck_sort',deckSort);
   renderLib();
 }
 
 function setHideDeckDuplicates(value){
   hideDeckDupes=Boolean(value);
-  localStorage.setItem('qf_hide_dupes',hideDeckDupes?'1':'0');
+  safeStorageSet(localStorage,'qf_hide_dupes',hideDeckDupes?'1':'0');
   renderLib();
 }
 
@@ -1134,11 +1134,12 @@ function init(){
     alert(`Built-in CISSP deck failed validation and was not loaded.\n\n${cisspValidation.problems.slice(0,8).join('\n')}`);
   }
 
-  const stored=JSON.parse(localStorage.getItem('qf_decks')||'[]');
+  const storedRaw=safeParseJSON(safeStorageGet(localStorage,'qf_decks','[]'),[]);
+  const stored=Array.isArray(storedRaw)?storedRaw.map(sanitizeDeck).filter(Boolean):[];
   const builtinDecks=cisspValidation.ok?BUILTIN:[];
-  const savedSort=localStorage.getItem('qf_deck_sort');
+  const savedSort=safeStorageGet(localStorage,'qf_deck_sort','');
   if(savedSort) deckSort=savedSort;
-  const savedHideDupes=localStorage.getItem('qf_hide_dupes');
+  const savedHideDupes=safeStorageGet(localStorage,'qf_hide_dupes',null);
   if(savedHideDupes!==null) hideDeckDupes=savedHideDupes==='1';
 
   library=[...builtinDecks,...stored];
@@ -1151,10 +1152,82 @@ function init(){
   pickProvider('smart');
   preloadRepoDecks({silent:true});
 }
-function saveLib(){localStorage.setItem('qf_decks',JSON.stringify(library.filter(d=>!d.builtin)))}
-function keyStoreGet(provider){return sessionStorage.getItem('qf_key_'+provider)||''}
-function keyStoreSet(provider,key){sessionStorage.setItem('qf_key_'+provider,key)}
-function getMissed(id){return JSON.parse(localStorage.getItem('qf_missed_'+id)||'[]')}
+const MAX_DECK_NAME_LEN=120;
+const MAX_TEXT_LEN=2000;
+const MAX_EXPLANATION_LEN=5000;
+const DECK_ID_RE=/^[a-zA-Z0-9._-]{1,80}$/;
+
+function safeParseJSON(raw,fallback){
+  if(!raw)return fallback;
+  try{return JSON.parse(raw);}catch{return fallback;}
+}
+function safeStorageGet(storage,key,fallback=''){
+  try{
+    const value=storage.getItem(key);
+    return value===null?fallback:value;
+  }catch{
+    return fallback;
+  }
+}
+function safeStorageSet(storage,key,value){
+  try{
+    storage.setItem(key,value);
+    return true;
+  }catch(err){
+    console.warn('Storage write failed for key:',key,err?.message||err);
+    showToast('Storage is full or unavailable. Some changes may not persist.','warn');
+    return false;
+  }
+}
+function normalizeText(input,maxLen=MAX_TEXT_LEN){
+  const str=String(input??'').replace(/\s+/g,' ').trim();
+  return str.slice(0,maxLen);
+}
+function isValidDeckId(id){
+  return DECK_ID_RE.test(String(id||''));
+}
+function sanitizeQuestion(raw,index){
+  if(!raw||typeof raw!=='object')return null;
+  const optionsRaw=raw.options&&typeof raw.options==='object'?raw.options:{};
+  const question=normalizeText(raw.question);
+  const options={
+    A:normalizeText(optionsRaw.A),
+    B:normalizeText(optionsRaw.B),
+    C:normalizeText(optionsRaw.C),
+    D:normalizeText(optionsRaw.D)
+  };
+  const answer=String(raw.answer||'').trim().toUpperCase();
+  if(!question||!options.A||!options.B||!options.C||!options.D||!['A','B','C','D'].includes(answer))return null;
+  const idNum=Number.isFinite(Number(raw.id))?Number(raw.id):index+1;
+  const clean={id:idNum,question,options,answer};
+  if(raw.explanation){
+    clean.explanation=normalizeText(raw.explanation,MAX_EXPLANATION_LEN);
+  }
+  return clean;
+}
+function sanitizeDeck(raw){
+  if(!raw||typeof raw!=='object')return null;
+  const rawId=String(raw.id||'').trim();
+  const id=isValidDeckId(rawId)?rawId:`custom_${Date.now()}_${Math.random().toString(36).slice(2,7)}`;
+  const questionsRaw=Array.isArray(raw.questions)?raw.questions:[];
+  const questions=questionsRaw.map((q,i)=>sanitizeQuestion(q,i)).filter(Boolean);
+  if(!questions.length)return null;
+  return {
+    id,
+    name:normalizeText(raw.name||'Untitled deck',MAX_DECK_NAME_LEN),
+    tag:normalizeText(raw.tag||'Custom',80),
+    provider:normalizeText(raw.provider||'import',30),
+    questions,
+    builtin:false
+  };
+}
+function saveLib(){safeStorageSet(localStorage,'qf_decks',JSON.stringify(library.filter(d=>!d.builtin)))}
+function keyStoreGet(provider){return safeStorageGet(sessionStorage,'qf_key_'+provider,'')}
+function keyStoreSet(provider,key){safeStorageSet(sessionStorage,'qf_key_'+provider,key)}
+function getMissed(id){
+  const parsed=safeParseJSON(safeStorageGet(localStorage,'qf_missed_'+id,'[]'),[]);
+  return Array.isArray(parsed)?parsed.filter(x=>Number.isFinite(Number(x))).map(Number):[];
+}
 function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
 function renderLib(){
@@ -1214,10 +1287,10 @@ function deleteDeck(id){if(!confirm('Delete this deck?'))return;library=library.
 function mergeDeckPayload(payload){
   if(!payload || !Array.isArray(payload.decks))throw new Error('Invalid file format');
   let imported=0, updated=0, skipped=0;
-  payload.decks.forEach(d=>{
-    const {_best,_missed,_sessions,...deck}=d||{};
-    if(!deck || !deck.id || !Array.isArray(deck.questions)){skipped++;return;}
-    deck.builtin=false;
+  payload.decks.forEach(rawDeck=>{
+    const {_best,_missed,_sessions,...deckCandidate}=rawDeck||{};
+    const deck=sanitizeDeck(deckCandidate);
+    if(!deck){skipped++;return;}
 
     const existing=library.find(x=>x.id===deck.id);
     if(existing){
@@ -1225,21 +1298,26 @@ function mergeDeckPayload(payload){
       existing.name=deck.name;
       existing.tag=deck.tag;
       existing.provider=deck.provider;
-      if(_missed?.length) localStorage.setItem('qf_missed_'+deck.id,JSON.stringify(_missed));
+      if(Array.isArray(_missed)&&_missed.length) safeStorageSet(localStorage,'qf_missed_'+deck.id,JSON.stringify(getMissedFromImport(_missed)));
       if(_best){
-        const localBest=parseInt(localStorage.getItem('qf_best_'+deck.id)||'0');
-        if(parseInt(_best)>localBest) localStorage.setItem('qf_best_'+deck.id,_best);
+        const localBest=parseInt(safeStorageGet(localStorage,'qf_best_'+deck.id,'0'))||0;
+        const nextBest=Math.max(localBest,Math.min(100,parseInt(_best)||0));
+        safeStorageSet(localStorage,'qf_best_'+deck.id,String(nextBest));
       }
       updated++;
     } else {
       library.push(deck);
-      if(_missed?.length) localStorage.setItem('qf_missed_'+deck.id,JSON.stringify(_missed));
-      if(_best) localStorage.setItem('qf_best_'+deck.id,_best);
-      if(_sessions) localStorage.setItem('qf_sessions_'+deck.id,_sessions);
+      if(Array.isArray(_missed)&&_missed.length) safeStorageSet(localStorage,'qf_missed_'+deck.id,JSON.stringify(getMissedFromImport(_missed)));
+      if(_best) safeStorageSet(localStorage,'qf_best_'+deck.id,String(Math.min(100,parseInt(_best)||0)));
+      if(_sessions) safeStorageSet(localStorage,'qf_sessions_'+deck.id,String(parseInt(_sessions)||0));
       imported++;
     }
   });
   return {imported,updated,skipped};
+}
+function getMissedFromImport(value){
+  if(!Array.isArray(value))return [];
+  return [...new Set(value.map(v=>Number(v)).filter(v=>Number.isFinite(v)&&v>0))];
 }
 
 async function preloadRepoDecks({silent=false}={}){
@@ -1409,7 +1487,9 @@ function dzDragLeave(){const z=document.getElementById('dz');if(z)z.classList.re
 function dzDrop(e){e.preventDefault();const z=document.getElementById('dz');if(z)z.classList.remove('drag-over');const f=e.dataTransfer.files[0];if(f)setFile(f)}
 function fileChosen(e){const f=e.target.files[0];if(f)setFile(f)}
 function setFile(f){
-  if(!f.name.endsWith('.pdf')){showErr('Please upload a PDF file.');return}
+  const hasPdfName=/\.pdf$/i.test(f.name||'');
+  const hasPdfType=(f.type||'').toLowerCase().includes('pdf');
+  if(!hasPdfName && !hasPdfType){showErr('Please upload a PDF file.');return}
   if(f.size>20*1024*1024){showErr('File too large. Max 20MB.');return}
   selFile=f;
   const dz=document.getElementById('dz');if(dz)dz.classList.add('has-file');
@@ -1474,8 +1554,8 @@ async function doExtract(){
       let js=raw.trim().replace(/^```json?\s*/,'').replace(/\s*```$/,'').trim();
       try{questions=JSON.parse(js)}catch{const m=raw.match(/\[[\s\S]*\]/);if(!m)throw new Error('Could not parse AI response as JSON.');questions=JSON.parse(m[0])}
     }
-    const deduped=dedupeQuestions(questions);
-    const valid=deduped.filter(q=>q.question&&q.options?.A&&q.options?.B&&q.options?.C&&q.options?.D&&['A','B','C','D'].includes(q.answer)).map((q,i)=>({...q,id:i+1}));
+    const deduped=dedupeQuestions(Array.isArray(questions)?questions:[]);
+    const valid=deduped.map((q,i)=>sanitizeQuestion({...q,id:i+1},i)).filter(Boolean).slice(0,500);
     if(!valid.length)throw new Error('No valid 4-option questions found.');
     addLog(`✓ ${valid.length} questions extracted!`,'ok');
     const deckId='custom_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
@@ -1563,9 +1643,10 @@ function startQuiz(){
   const cnt=document.getElementById('sq').value,ord=document.getElementById('so').value;
   const tmr=parseInt(document.getElementById('st').value)||0;
   const foc=document.getElementById('sf').value;
-  let pool=[...d.questions];
+  let pool=d.questions.map((q,i)=>sanitizeQuestion(q,i)).filter(Boolean);
   if(foc==='missed'||mode==='missed'){const m=getMissed(d.id);if(!m.length){alert('No missed questions yet!');return}pool=pool.filter(q=>m.includes(q.id))}
   if(ord==='random'||mode==='random')pool=pool.sort(()=>Math.random()-0.5);
+  if(!pool.length){alert('This deck has no valid questions to quiz right now.');return;}
   const n=cnt==='all'?pool.length:Math.min(parseInt(cnt),pool.length);pool=pool.slice(0,n);
   closeSettings();
   qs={deckId:d.id,deckName:d.name,mode,questions:pool,cur:0,score:0,answers:new Array(pool.length).fill(null),answered:false,timerSec:tmr*60,startTime:Date.now()};
@@ -1579,7 +1660,7 @@ function renderQ(){
   document.getElementById('qpfill').style.width=pct+'%';
   document.querySelector('.qptrack[role="progressbar"]').setAttribute('aria-valuenow',Math.round(pct));
   document.getElementById('qplabel').textContent=`Q${qs.cur+1} of ${tot}`;
-  document.getElementById('qscore').innerHTML=`Score: <b>${qs.score}</b> / ${qs.cur}`;
+  document.getElementById('qscore').textContent=`Score: ${qs.score} / ${qs.cur}`;
   document.getElementById('qbrand').textContent=qs.deckName.split(' ')[0].toUpperCase().slice(0,6);
   document.getElementById('qbadge').textContent='Q'+String(q.id).padStart(3,'0');
   document.getElementById('qtext').innerHTML=escH(q.question).replace(/\b(MOST|BEST|FIRST|LAST|PRIMARY|MAIN|ONLY|NEVER|ALWAYS|MUST|NOT)\b/g,'<strong>$1</strong>');
@@ -1587,7 +1668,14 @@ function renderQ(){
   ['A','B','C','D'].forEach(k=>{
     const b=document.createElement('button');b.className='opt';b.onclick=()=>pick(k);
     b.setAttribute('aria-label','Option '+k+': '+q.options[k]);
-    b.innerHTML=`<div class="okey" aria-hidden="true">${k}</div><div class="otext">${escH(q.options[k])}</div>`;
+    const keyEl=document.createElement('div');
+    keyEl.className='okey';
+    keyEl.setAttribute('aria-hidden','true');
+    keyEl.textContent=k;
+    const textEl=document.createElement('div');
+    textEl.className='otext';
+    textEl.textContent=q.options[k];
+    b.append(keyEl,textEl);
     el.appendChild(b);
   });
   document.getElementById('fbar').className='fbar';
@@ -1623,7 +1711,11 @@ function pick(key){
       fbar.className='fbar ok show';icon.textContent='✓';txt.textContent='Correct!';
     } else {
       fbar.className='fbar ng show';icon.textContent='✗';
-      txt.innerHTML=`Incorrect — correct answer: <span class="ans-reveal">${correct}. ${escH(q.options[correct])}</span>`;
+      txt.textContent='Incorrect — correct answer: ';
+      const reveal=document.createElement('span');
+      reveal.className='ans-reveal';
+      reveal.textContent=`${correct}. ${q.options[correct]}`;
+      txt.appendChild(reveal);
     }
     // Show explanation if pre-generated, else offer on-demand button
     if(q.explanation){
@@ -1634,7 +1726,7 @@ function pick(key){
     document.getElementById('btn-fix').className='btn-fix show';
   }
   document.getElementById('btn-next').className='btn-next show';
-  document.getElementById('qscore').innerHTML=`Score: <b>${qs.score}</b> / ${qs.cur+1}`;
+  document.getElementById('qscore').textContent=`Score: ${qs.score} / ${qs.cur+1}`;
 }
 
 function nextQ(){qs.cur++;if(qs.cur>=qs.questions.length)endQuiz();else{renderQ();window.scrollTo(0,0)}}
@@ -2242,10 +2334,18 @@ function importAllData(e){
   const file=e.target.files[0];
   e.target.value=''; // reset so same file can be re-imported
   if(!file)return;
+  if(file.size>5*1024*1024){
+    showToast('Import file too large (max 5MB).','err');
+    return;
+  }
+  if(!/\.json$/i.test(file.name)){
+    showToast('Please import a .json export file.','err');
+    return;
+  }
   const reader=new FileReader();
   reader.onload=ev=>{
     try{
-      const payload=JSON.parse(ev.target.result);
+      const payload=JSON.parse(String(ev.target.result||''));
       const {imported,updated,skipped}=mergeDeckPayload(payload);
 
       saveLib();renderLib();
@@ -2316,10 +2416,27 @@ function openEditQ(deckId, questionId, source){
   ['A','B','C','D'].forEach(k=>{
     const row=document.createElement('div');
     row.className='eq-option-row';
-    row.innerHTML=`
-      <input type="radio" name="eq-answer" value="${k}" id="eq-r-${k}" class="eq-radio" ${q.answer===k?'checked':''} aria-label="Mark option ${k} as correct answer">
-      <label for="eq-r-${k}" class="eq-letter" title="Mark as correct">${k}</label>
-      <input type="text" class="form-input eq-opt-text" id="eq-opt-${k}" value="${escH(q.options[k]||'')}" placeholder="Option ${k} text…" aria-label="Option ${k} text">`;
+    const radio=document.createElement('input');
+    radio.type='radio';
+    radio.name='eq-answer';
+    radio.value=k;
+    radio.id='eq-r-'+k;
+    radio.className='eq-radio';
+    radio.checked=q.answer===k;
+    radio.setAttribute('aria-label',`Mark option ${k} as correct answer`);
+    const label=document.createElement('label');
+    label.htmlFor='eq-r-'+k;
+    label.className='eq-letter';
+    label.title='Mark as correct';
+    label.textContent=k;
+    const input=document.createElement('input');
+    input.type='text';
+    input.className='form-input eq-opt-text';
+    input.id='eq-opt-'+k;
+    input.value=q.options[k]||'';
+    input.placeholder=`Option ${k} text…`;
+    input.setAttribute('aria-label',`Option ${k} text`);
+    row.append(radio,label,input);
     optEl.appendChild(row);
   });
   document.getElementById('edit-q-modal').className='modal-overlay show';
@@ -2432,7 +2549,8 @@ function renderDeckEditorList(filter){
   let h='';
   let count=0;
   deck.questions.forEach(question=>{
-    if(q&&!question.question.toLowerCase().includes(q)&&!Object.values(question.options).some(o=>o.toLowerCase().includes(q)))return;
+    const opts=question.options&&typeof question.options==='object'?question.options:{A:'',B:'',C:'',D:''};
+    if(q&&!question.question.toLowerCase().includes(q)&&!Object.values(opts).some(o=>String(o).toLowerCase().includes(q)))return;
     count++;
     const preview=question.question.length>80?question.question.slice(0,80)+'…':question.question;
     h+=`<div class="deq-row" role="listitem">
