@@ -193,6 +193,7 @@ body::after {
 .form-input { width:100%; padding:12px 14px; background:var(--surface2); border:1px solid var(--border2); border-radius:10px; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:13px; outline:none; transition:border-color 0.2s; }
 .form-input:focus { border-color:var(--accent); }
 .form-input::placeholder { color:var(--muted); }
+.touch-file-input { position:absolute; width:1px; height:1px; margin:-1px; border:0; padding:0; overflow:hidden; clip:rect(0,0,0,0); clip-path:inset(50%); white-space:nowrap; }
 .key-note { font-size:12px; color:var(--text2); margin-top:8px; line-height:1.6; }
 .key-note a { text-decoration:none; }
 
@@ -650,15 +651,14 @@ button:focus-visible, a:focus-visible { outline:2px solid var(--accent); outline
 
     <!-- Step 3: Upload -->
     <div id="sc3" style="display:none">
-      <div class="drop-zone" id="dz"
-        onclick="document.getElementById('finput').click()"
+      <label class="drop-zone" id="dz" for="finput"
         ondragover="dzDragOver(event)" ondragleave="dzDragLeave()" ondrop="dzDrop(event)">
         <span class="drop-icon">📄</span>
         <div class="drop-title">Drop your PDF here</div>
         <div class="drop-sub">or click to browse — max 20MB</div>
         <div class="drop-fname" id="fname"></div>
-      </div>
-      <input type="file" id="finput" accept=".pdf" style="display:none" onchange="fileChosen(event)">
+      </label>
+      <input type="file" id="finput" class="touch-file-input" accept="application/pdf,.pdf" onchange="fileChosen(event)">
       <br>
       <button class="btn-big btn-green" id="btn-extract" onclick="doExtract()" disabled>Extract Questions →</button>
     </div>
@@ -1335,6 +1335,28 @@ function bindGlobalListeners(){
     if(!qs.answered){const m={a:'A',b:'B',c:'C',d:'D',1:'A',2:'B',3:'C',4:'D'};if(m[e.key.toLowerCase()])pick(m[e.key.toLowerCase()])}
     else if(['Enter',' ','ArrowRight'].includes(e.key))nextQ();
   });
+
+  // Mobile usability: allow keyboard "Go/Enter" to advance key-required steps.
+  const apiKeyInput=document.getElementById('api-key');
+  if(apiKeyInput){
+    apiKeyInput.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){e.preventDefault();goImportStep3();}
+    });
+  }
+
+  const egApiKeyInput=document.getElementById('eg-api-key');
+  if(egApiKeyInput){
+    egApiKeyInput.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){e.preventDefault();startExplainGen();}
+    });
+  }
+
+  const cuApiKeyInput=document.getElementById('cu-api-key');
+  if(cuApiKeyInput){
+    cuApiKeyInput.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){e.preventDefault();startCleanup();}
+    });
+  }
 }
 
 function setImportStep(n){
